@@ -1,11 +1,11 @@
 ﻿# Gensokishi_PyAutoGui
 
-﻿#¿Requisitos?
+## ¿Requisitos?
 Python
 Pyautogui
 Cv2
 
-﻿#¿Cómo funciona?
+## ¿Cómo funciona?
 1) Abrir el Juego y unirse a la party.
 2) Ejecutar el Script.
 3) Farmearrrrrrrr
