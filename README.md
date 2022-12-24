@@ -1,9 +1,9 @@
 ﻿# Gensokishi_PyAutoGui
 
 ## ¿Requisitos?
-Python
-Pyautogui
-Cv2
+1) Python
+2) Pyautogui
+3) Cv2
 
 ## ¿Cómo funciona?
 1) Abrir el Juego y unirse a la party.
