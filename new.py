@@ -63,7 +63,7 @@ def main():
     print("2) Solo")
     value = input()
 
-    if value == 1:
+    if value == "1":
         ScriptParty()
     else:
         ScriptSolo()
@@ -103,11 +103,13 @@ def ScriptParty():
         action = CheckPlayerAction()
 
         if action is PLAYER_ACTION.COMBAT:
+            print("En Combate!")
             PerformAttack()
             time.sleep(1)
             continue
 
         if action is PLAYER_ACTION.PARTY_COMBAT:
+            print("Party peleando!")
             pyautogui.moveTo(VAR_PARTY_BUTTON_POSITION)
             pyautogui.click(VAR_PARTY_BUTTON_POSITION)
             time.sleep(0.2)
