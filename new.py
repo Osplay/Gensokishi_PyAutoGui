@@ -59,6 +59,33 @@ def PerformAttack():
         pyautogui.click(VAR_ATTACK_BUTTON_POSITION)
 
 def main():
+    print("1) Party")
+    print("2) Solo")
+    value = input()
+
+    if value == 1:
+        ScriptParty()
+    else:
+        ScriptSolo()
+
+def ScriptSolo():
+    global VAR_ATTACK_BUTTON_POSITION
+    global VAR_PARTY_BUTTON_POSITION
+    global PATH_BUTTON_ATTACK_IDLE
+    global PATH_BUTTON_PARTY
+    
+
+    VAR_ATTACK_BUTTON_POSITION = SetButtonPosition("ataque", PATH_BUTTON_ATTACK_IDLE)
+
+    while True:
+        
+        #Script Temporal para sólo atacar según el botón de party
+
+        PerformAttack()
+
+        time.sleep(3) # tiempo prudencial cuando estoy haciendo debugging
+
+def ScriptParty():
     
     global VAR_ATTACK_BUTTON_POSITION
     global VAR_PARTY_BUTTON_POSITION
@@ -82,11 +109,10 @@ def main():
 
         if action is PLAYER_ACTION.PARTY_COMBAT:
             pyautogui.moveTo(VAR_PARTY_BUTTON_POSITION)
-            time.sleep(0.2)
             pyautogui.click(VAR_PARTY_BUTTON_POSITION)
             time.sleep(0.2)
             pyautogui.moveTo(VAR_ATTACK_BUTTON_POSITION)
-            time.sleep(1)
+            time.sleep(0.2)
             pyautogui.click(VAR_ATTACK_BUTTON_POSITION)
 
 
