@@ -126,7 +126,7 @@ def ScriptSolo():
 
     VAR_ATTACK_BUTTON_POSITION = SetButtonPosition("ataque", PATH_BUTTON_ATTACK_IDLE)
 
-    var_steps_min = 5 # minimum of step to move the mouse.
+    var_steps_min = 15 # minimum of step to move the mouse.
     var_place_to_torn = PLAYER_DIRECTIONS.UP # Posible directions of the player.
 
     while True:
@@ -136,7 +136,7 @@ def ScriptSolo():
         #Jugador está en combate.
         action = CheckPlayerAction()
 
-        if action == PLAYER_ACTION.COMBAT:
+        if action == PLAYER_ACTION.COMBAT or action == PLAYER_ACTION.PARTY_COMBAT:
             #Hacer ataque.
             PerformAttack()
         else:
@@ -152,10 +152,15 @@ def ScriptSolo():
                     var_place_to_torn = PLAYER_DIRECTIONS.LEFT
                 else:
                     var_place_to_torn = PLAYER_DIRECTIONS.UP
-                    var_steps_min += 2 #agregamos para movernos más espacios.
+                    var_steps_min += 5 #agregamos para movernos más espacios.
                 
                 PerformAttack() #Verificamos si se puede atacar
                 time.sleep(0.5)
+
+                action = CheckPlayerAction()
+
+                if action == PLAYER_ACTION.COMBAT or action == PLAYER_ACTION.PARTY_COMBAT:
+                    break
 
         time.sleep(3) # tiempo prudencial cuando estoy haciendo debugging
 
