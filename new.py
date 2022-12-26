@@ -9,15 +9,17 @@ PATH_IMG = PATH + r"\img"
 VAR_ATTACK_BUTTON_POSITION = None
 VAR_PARTY_BUTTON_POSITION = None
 VAR_SCREEN_CENTER = None
+VAR_REMOVE_BUTTON_POSITION = None
 
 PATH_BUTTON_ATTACK_IDLE = PATH_IMG+r"\attack_idle.png"
 PATH_BUTTON_ATTACK = PATH_IMG+r"\attack.png"
 PATH_BUTTON_NPC_TALK = PATH_IMG+r"\button_npc_talk.png"
-PATH_BUTTON_PLAYER_TALK = PATH_IMG+r"\button_npc_talk.png"
+PATH_BUTTON_CLOSE_FOCUS = PATH_IMG+r"\button_close_focus.png"
+PATH_BUTTON_PLAYER_TALK = PATH_IMG+r"\button_player_talk.png"
 PATH_BUTTON_PARTY = PATH_IMG + r"\party.png"
 PATH_ICON_COMBAT = PATH_IMG + r"\combat.png"
 PATH_ICON_PARTY_COMBAT = PATH_IMG + r"\combat_party.png"
-PATH_ICON_NPC_ENEMEY = PATH_IMG+r"\icon_npc_enemy.png"
+PATH_ICON_NPC_ENEMY = PATH_IMG+r"\icon_npc_enemy.png"
 
 class PLAYER_ACTION(Enum):
     IDLE = 0
@@ -65,15 +67,34 @@ def PerformAttack():
     global PATH_BUTTON_NPC_TALK
     global VAR_ATTACK_BUTTON_POSITION
 
-    if pyautogui.locateOnScreen(PATH_BUTTON_NPC_TALK, confidence=0.70) is not None:
+    if pyautogui.locateOnScreen(PATH_BUTTON_NPC_TALK, confidence=0.90) is not None:
+        RemoveFocus()
         return
     if pyautogui.locateOnScreen(PATH_BUTTON_PLAYER_TALK, confidence=0.70) is not None:
+        RemoveFocus()
         return
     if pyautogui.locateOnScreen(PATH_BUTTON_ATTACK_IDLE, confidence=0.70) is not None:
         return
 
     pyautogui.moveTo(VAR_ATTACK_BUTTON_POSITION)
     pyautogui.click(VAR_ATTACK_BUTTON_POSITION)
+
+def RemoveFocus():
+    global PATH_BUTTON_CLOSE_FOCUS
+    global VAR_REMOVE_BUTTON_POSITION
+
+    if VAR_REMOVE_BUTTON_POSITION is None:
+        
+        location = pyautogui.locateCenterOnScreen(image=PATH_BUTTON_CLOSE_FOCUS, confidence=0.70)
+        
+        if location is None:
+            return
+        
+        VAR_REMOVE_BUTTON_POSITION = location
+
+    pyautogui.moveTo(VAR_REMOVE_BUTTON_POSITION)
+    time.sleep(0.2)
+    pyautogui.click()
 
 def ButtonExist(button, confidence):
     if pyautogui.locateAllOnScreen(image=button, confidence=confidence) is None:
@@ -84,9 +105,6 @@ def ButtonExist(button, confidence):
 def PlayerMoveSteps(direction, steps):
     #Uso la posición del centro
     global VAR_SCREEN_CENTER
-
-    #muevo el puntero al medio
-    pyautogui.moveTo(VAR_SCREEN_CENTER)
 
     #espero x tiempo
     time.sleep(0.2)
@@ -133,7 +151,7 @@ def ScriptSolo():
     global VAR_PARTY_BUTTON_POSITION
     global PATH_BUTTON_ATTACK_IDLE
     global PATH_BUTTON_PARTY
-    global PATH_ICON_NPC_ENEMEY
+    global PATH_ICON_NPC_ENEMY
     
 
     VAR_ATTACK_BUTTON_POSITION = SetButtonPosition("ataque", PATH_BUTTON_ATTACK_IDLE)
@@ -154,7 +172,7 @@ def ScriptSolo():
         else:
             PerformAttack() # Intento realizar un ataque
 
-            while ButtonExist(PATH_BUTTON_ATTACK_IDLE, 0.65) is True:
+            while ButtonExist(PATH_BUTTON_ATTACK_IDLE, 02.65) is True:
                 #Muevo al jugador a la posición y reseteo
                 PlayerMoveSteps(var_place_to_torn, var_steps_min)
 
@@ -167,6 +185,7 @@ def ScriptSolo():
                 else:
                     var_place_to_torn = PLAYER_DIRECTIONS.UP
                     var_steps_min += 2 #agregamos para movernos más espacios.
+                    pyautogui.press('r')
                 
                 PerformAttack() #Verificamos si se puede atacar
                 time.sleep(0.5)
@@ -178,12 +197,13 @@ def ScriptSolo():
 
                 #intentar ir hacia posición del npc más cercano.
 
-                var_npc_location = pyautogui.locateOnScreen(image=PATH_ICON_NPC_ENEMEY, confidence=0.65)
+                var_npc_location = pyautogui.locateOnScreen(image=PATH_ICON_NPC_ENEMY, confidence=0.60)
 
                 if var_npc_location is not None:
                     pyautogui.moveTo(var_npc_location)
                     time.sleep(0.2)
                     pyautogui.click()
+                    time.sleep(3)
             
 
         time.sleep(3) # tiempo prudencial cuando estoy haciendo debugging
@@ -223,7 +243,7 @@ def ScriptParty():
             action = CheckPlayerAction()
 
             if action is not PLAYER_ACTION.COMBAT:
-                pyautogui.moveTo(VAR_SCREEN_CENTER[0]+15, VAR_SCREEN_CENTER[1]+15)
+                pyautogui.moveTo(VAR_SCREEN_CENTER[0]+30, VAR_SCREEN_CENTER[1]+30)
                 pyautogui.sleep(0.2)
                 pyautogui.click()
                 print("No está en el centro!")
