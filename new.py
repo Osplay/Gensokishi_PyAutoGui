@@ -62,10 +62,6 @@ def CheckPlayerAction():
     print("No sé! :|")
     return PLAYER_ACTION.UNKNOW
 
-
-
-
-
 def PerformAttack():
     global PATH_BUTTON_PLAYER_TALK
     global PATH_BUTTON_NPC_TALK
@@ -129,6 +125,23 @@ def PlayerMoveStepsMouse(direction, steps):
     pyautogui.moveTo(var_player_x, var_player_y)
     pyautogui.sleep(0.2)
     pyautogui.click()
+    pyautogui.sleep(0.5)
+
+def PlayerMoveStepsKeyboard(direction, steps_in_seconds):
+    key = None
+
+    if direction == PLAYER_DIRECTIONS.UP:
+        key = 'w'
+    elif(direction == PLAYER_DIRECTIONS.RIGHT):
+        key = 'd'
+    elif(direction == PLAYER_DIRECTIONS.DOWN):
+        key = 's'
+    else:
+        key = 'a'
+
+    pyautogui.keyDown(key)
+    pyautogui.sleep(steps_in_seconds)
+    pyautogui.keyUp(key)
     pyautogui.sleep(0.5)
 
 def NextMovementTorn(torn_to):
@@ -196,8 +209,8 @@ def ScriptSolo():
                 if action == PLAYER_ACTION.COMBAT: # el jugador entra en combate por lo que ignoro el resto
                     break
 
-                PlayerMoveStepsMouse(var_place_to_torn, 12)
-                var_place_to_torn = NextMovementTorn(var_place_to_torn)
+            PlayerMoveStepsKeyboard(var_place_to_torn, 1)
+            var_place_to_torn = NextMovementTorn(var_place_to_torn)
                 
 
 
