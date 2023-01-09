@@ -5,7 +5,6 @@ from enum import Enum
 PATH = os.path.abspath(".")
 PATH_IMG = PATH + r"\img"
 
-VAR_ATTACK_BUTTON_POSITION = None
 VAR_PARTY_BUTTON_POSITION = None
 VAR_SCREEN_CENTER = None
 VAR_REMOVE_BUTTON_POSITION = None
@@ -225,15 +224,12 @@ def main():
 
 ## Scripts --------
 def ScriptSolo():
-    global VAR_ATTACK_BUTTON_POSITION
     global VAR_PARTY_BUTTON_POSITION
     global PATH_BUTTON_ATTACK_IDLE
     global PATH_BUTTON_PARTY
     global PATH_ICON_NPC_ENEMY
     global VAR_BUTTON_ATTACK_MONK
     global PATH_BUTTON_ATTACK_MONK
-
-    VAR_ATTACK_BUTTON_POSITION = SetButtonPosition("ataque", PATH_BUTTON_ATTACK_IDLE, False)
 
     for x in range(len(PATH_BUTTON_ATTACK_MONK)):
         print(x)
@@ -268,14 +264,12 @@ def ScriptSolo():
 
 def ScriptParty():
     
-    global VAR_ATTACK_BUTTON_POSITION
+
     global VAR_PARTY_BUTTON_POSITION
     global PATH_BUTTON_ATTACK_IDLE
     global PATH_BUTTON_PARTY
     global VAR_SCREEN_CENTER
     
-
-    VAR_ATTACK_BUTTON_POSITION = SetButtonPosition("ataque", PATH_BUTTON_ATTACK_IDLE, False)
     VAR_PARTY_BUTTON_POSITION = SetButtonPosition("party", PATH_BUTTON_PARTY, False)
 
     while True:
@@ -295,8 +289,7 @@ def ScriptParty():
             pyautogui.moveTo(VAR_PARTY_BUTTON_POSITION)
             pyautogui.click(VAR_PARTY_BUTTON_POSITION)
             pyautogui.sleep(0.2)
-            pyautogui.moveTo(VAR_ATTACK_BUTTON_POSITION)
-            pyautogui.click(VAR_ATTACK_BUTTON_POSITION)
+            pyautogui.press('enter')
             pyautogui.sleep(0.2)
             action = CheckPlayerAction()
 
