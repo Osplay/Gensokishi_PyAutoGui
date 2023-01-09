@@ -1,5 +1,4 @@
 import pyautogui
-import pydirectinput
 import os
 from enum import Enum
 
@@ -10,6 +9,7 @@ VAR_ATTACK_BUTTON_POSITION = None
 VAR_PARTY_BUTTON_POSITION = None
 VAR_SCREEN_CENTER = None
 VAR_REMOVE_BUTTON_POSITION = None
+VAR_BUTTON_ATTACK_MONK = [None,None]
 
 PATH_BUTTON_ATTACK_IDLE = PATH_IMG+r"\attack_idle.png"
 PATH_BUTTON_ATTACK = PATH_IMG+r"\attack.png"
@@ -20,7 +20,9 @@ PATH_BUTTON_PARTY = PATH_IMG + r"\party.png"
 PATH_ICON_COMBAT = PATH_IMG + r"\combat.png"
 PATH_ICON_PARTY_COMBAT = PATH_IMG + r"\combat_party.png"
 PATH_ICON_NPC_ENEMY = PATH_IMG+r"\icon_npc_enemy.png"
-
+PATH_BUTTON_ATTACK_MONK = [PATH_IMG+r"\button_monk_attack_meditation.png", PATH_IMG+r"\button_monk_attack_martial_fist.png"]
+PATH_BUTTON_OUTSCOPE_TALK = PATH_IMG + r"\outside_message.png"
+PATH_BUTTON_OUTSCOPE_MARKET_CLOSE = PATH_IMG + r"\outside_close.png"
 class PLAYER_ACTION(Enum):
     IDLE = 0
     COMBAT = 1
@@ -33,17 +35,49 @@ class PLAYER_DIRECTIONS(Enum):
     DOWN = 2,
     LEFT = 3
 
-def SetButtonPosition(name_button, path):
+def SetButtonPosition(name_button, path, ignore_if_fail):
     print(f"Configurando posición del botón {name_button}...")
     while True:
-        resp = pyautogui.locateCenterOnScreen(image=path, confidence=0.75)
+        resp = pyautogui.locateCenterOnScreen(image=path, confidence=0.70)
         print(resp)
         if resp != None:
             print(f"Posición del Botón {name_button}: {resp} ")
             return resp
         else:
             print("Posición no encontrada...")
+
         pyautogui.sleep(1)
+
+        if ignore_if_fail is True:
+            break
+
+def OutScope():
+    global PATH_BUTTON_OUTSCOPE_TALK
+    global PATH_BUTTON_OUTSCOPE_MARKET_CLOSE
+
+    if pyautogui.locateOnScreen(PATH_BUTTON_OUTSCOPE_TALK, confidence=0.80) is not None:
+        
+        try_max_to_check = 2
+        try_check = 0
+
+        while True:
+
+            if try_check >= try_max_to_check:
+                break
+
+            if pyautogui.locateOnScreen(VAR_BUTTON_OUTSCOPE_TALK, confidence= 0.8) is not None:
+                pyautogui.press("enter")
+                pyautogui.sleep(0.3)
+            else:
+                try_check = try_check+1
+    
+    quit = pyautogui.locateOnScreen(PATH_BUTTON_OUTSCOPE_MARKET_CLOSE, confidence=0.7)
+    if quit is not None:
+        pyautogui.moveTo(quit)
+        pyautogui.sleep(0.3)
+        pyautogui.click()
+            
+
 
 def CheckPlayerAction():
     global PATH_ICON_COMBAT
@@ -65,19 +99,34 @@ def CheckPlayerAction():
 def PerformAttack():
     global PATH_BUTTON_PLAYER_TALK
     global PATH_BUTTON_NPC_TALK
-    global VAR_ATTACK_BUTTON_POSITION
+    global PATH_BUTTON_ATTACK
+    global VAR_BUTTON_ATTACK_MONK
+    global PATH_BUTTON_ATTACK_MONK
 
+    if pyautogui.locateOnScreen(PATH_BUTTON_ATTACK, confidence=0.70) is not None:
+        pyautogui.press("enter")
+        return
     if pyautogui.locateOnScreen(PATH_BUTTON_NPC_TALK, confidence=0.90) is not None:
         pyautogui.press('esc')
         return
     if pyautogui.locateOnScreen(PATH_BUTTON_PLAYER_TALK, confidence=0.70) is not None:
         pyautogui.press('esc')
         return
+
+    for x in range(len(PATH_BUTTON_ATTACK_MONK)):
+        if VAR_BUTTON_ATTACK_MONK[x] is not None and pyautogui.locateOnScreen(PATH_BUTTON_ATTACK_MONK[x], confidence=0.75) is not None:
+            pyautogui.moveTo(VAR_BUTTON_ATTACK_MONK[x])
+            pyautogui.sleep(0.4)
+            pyautogui.click(VAR_BUTTON_ATTACK_MONK[x])
+        else:
+          VAR_BUTTON_ATTACK_MONK[x] = SetButtonPosition("ataque meditation monk", PATH_BUTTON_ATTACK_MONK[x], True)
+
     if pyautogui.locateOnScreen(PATH_BUTTON_ATTACK_IDLE, confidence=0.70) is not None:
         return
 
     pyautogui.press('enter')
-    pyautogui.sleep(1)
+    pyautogui.sleep(0.3)
+
 
 def RemoveFocusMouse(): # deprecated
     global PATH_BUTTON_CLOSE_FOCUS
@@ -181,9 +230,14 @@ def ScriptSolo():
     global PATH_BUTTON_ATTACK_IDLE
     global PATH_BUTTON_PARTY
     global PATH_ICON_NPC_ENEMY
-    
+    global VAR_BUTTON_ATTACK_MONK
+    global PATH_BUTTON_ATTACK_MONK
 
-    VAR_ATTACK_BUTTON_POSITION = SetButtonPosition("ataque", PATH_BUTTON_ATTACK_IDLE)
+    VAR_ATTACK_BUTTON_POSITION = SetButtonPosition("ataque", PATH_BUTTON_ATTACK_IDLE, False)
+
+    for x in range(len(PATH_BUTTON_ATTACK_MONK)):
+        print(x)
+        VAR_BUTTON_ATTACK_MONK[x] = SetButtonPosition("ataque meditation monk", PATH_BUTTON_ATTACK_MONK[x], True)
 
     var_steps_min = 0.5 # minimum of step to move the mouse.
     var_place_to_torn = PLAYER_DIRECTIONS.UP # Posible directions of the player.
@@ -193,28 +247,24 @@ def ScriptSolo():
     while True:
         
         PerformAttack()
-
+        
         action = CheckPlayerAction()
 
         if action != PLAYER_ACTION.COMBAT:
 
             for x in range(6):
-                #Selecciono target con teclado
-                pyautogui.press('left')
-                pyautogui.sleep(0.8)
+                pyautogui.press("d")
+                pyautogui.sleep(0.4)
                 PerformAttack()
 
-                action = CheckPlayerAction()
-
-                if action == PLAYER_ACTION.COMBAT: # el jugador entra en combate por lo que ignoro el resto
-                    break
-
-            PlayerMoveStepsKeyboard(var_place_to_torn, 1)
+            PlayerMoveStepsKeyboard(var_place_to_torn, 0.3
+)
             var_place_to_torn = NextMovementTorn(var_place_to_torn)
+            PerformAttack()
+
+            OutScope()
                 
 
-
-        pyautogui.sleep(3) # tiempo prudencial cuando estoy haciendo debugging
 
 def ScriptParty():
     
@@ -225,8 +275,8 @@ def ScriptParty():
     global VAR_SCREEN_CENTER
     
 
-    VAR_ATTACK_BUTTON_POSITION = SetButtonPosition("ataque", PATH_BUTTON_ATTACK_IDLE)
-    VAR_PARTY_BUTTON_POSITION = SetButtonPosition("party", PATH_BUTTON_PARTY)
+    VAR_ATTACK_BUTTON_POSITION = SetButtonPosition("ataque", PATH_BUTTON_ATTACK_IDLE, False)
+    VAR_PARTY_BUTTON_POSITION = SetButtonPosition("party", PATH_BUTTON_PARTY, False)
 
     while True:
         
